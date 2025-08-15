@@ -30,8 +30,6 @@ from qgis.core import Qgis, QgsApplication, QgsCoordinateReferenceSystem, QgsCon
                         
 
 import os.path
-import posixpath
-import ntpath
 import glob
 import shutil
 import time
@@ -213,11 +211,14 @@ class QSWATUtils:
     
     @staticmethod
     def join(path: str, fileName: str) -> str:
-        """Use appropriate path separator."""
-        if os.name == 'nt':
-            return ntpath.join(path, fileName)
-        else:
-            return posixpath.join(path, fileName)
+        """Join ``path`` and ``fileName`` using the system separator and normalize it.
+
+        Uses :func:`os.path.join` to concatenate the path elements and
+        :func:`os.path.normpath` to tidy the result.  This removes any
+        platform-specific handling that previously used ``ntpath`` and
+        ``posixpath`` explicitly.
+        """
+        return os.path.normpath(os.path.join(path, fileName))
         
     @staticmethod
     def samePath(p1: str, p2: str)-> bool:
