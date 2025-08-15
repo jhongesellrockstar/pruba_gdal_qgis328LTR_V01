@@ -605,14 +605,14 @@ class Landscape(QObject):
                     useInversion = True
                     doHillslopes = True
                 except Exception:
-                    QSWATUtils.information('Please set a ridge threshold (an integer number of cells)')
+                    QSWATUtils.information('Please set a ridge threshold (an integer number of cells)', self._gv.isBatch)
                     return
             else:
                 try:
                     self.branchThresh = int(self._dlg.branchThreshold.text())
                     doHillslopes = True
                 except Exception:
-                    QSWATUtils.information('Please set a branch length threshold (an integer number of metres)')
+                    QSWATUtils.information('Please set a branch length threshold (an integer number of metres)', self._gv.isBatch)
                     return
         root = QgsProject.instance().layerTreeRoot()
         if doHillslopes or doFloodplain and not useBuffer:

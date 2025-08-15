@@ -173,17 +173,11 @@ class QSWATUtils:
         return result
     
     @staticmethod
-    @staticmethod
-    def information(title, msg):
-        """
-        sys.stdout.write('{0}\n'.format(msg))
-        """
-        from qgis.core import QgsMessageLog, Qgis
-        QgsMessageLog.logMessage(msg, title, level=Qgis.Info)
-
-        # Si quieres mantener la impresión por consola si está disponible:
-        if sys.stdout:
-            print(f'{title}: {msg}')
+    def information(msg: str, isBatch: bool) -> None:
+        """Log *msg* to the QGIS message panel and optionally to stdout."""
+        QgsMessageLog.logMessage(msg, QSWATUtils._QSWATNAME, Qgis.Info)
+        if isBatch:
+            sys.stdout.write(f"{msg}\n")
 
     
     @staticmethod

@@ -166,10 +166,9 @@ class QSWATPlus(QObject):
             QIcon(":/plugins/QSWATPlus/swatplus32.png"),
             '{0}'.format(QSWATUtils._QSWATNAME), self._iface.mainWindow())
         if self.action.icon().isNull():
-            QSWATUtils.information("DEBUG", "El ícono no se ha cargado correctamente.")
+            QSWATUtils.information("DEBUG: El ícono no se ha cargado correctamente.", False)
         else:
-            #QSWATUtils.information("DEBUG", "Ícono cargado correctamente.")
-            QSWATUtils.information.__func__("DEBUG", "Ícono cargado correctamente.")
+            QSWATUtils.information("DEBUG: Ícono cargado correctamente.", False)
 
 
         # connect the action to the run method

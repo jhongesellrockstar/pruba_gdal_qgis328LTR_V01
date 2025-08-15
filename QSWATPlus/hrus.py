@@ -1075,21 +1075,21 @@ class CreateHRUs(QObject):
                 if soilMapPercent < 1:
                     # start of message is key phrase for HUC12Models
                     QSWATUtils.information(u'EMPTY PROJECT: only {0} percent of the watershed in project huc{1} is inside the soil map'
-                                           .format(locale.format_string('%.1F', soilMapPercent), huc12), self._gv.isBatch, logFile=logFile)
+                                           .format(locale.format_string('%.1F', soilMapPercent), huc12), self._gv.isBatch)
                     return False
                 elif soilMapPercent < 95:
                     # start of message is key phrase for HUC12Models
                     QSWATUtils.information('UNDER95 WARNING: only {0} percent of the watershed in project huc{1} is inside the soil map.'
-                                           .format(locale.format_string('%.1F', soilMapPercent), huc12), self._gv.isBatch, logFile=logFile)
+                                           .format(locale.format_string('%.1F', soilMapPercent), huc12), self._gv.isBatch)
                     under95 = True
                 elif soilMapPercent < 99.95: # always give statistic for HUC models; avoid saying 100.0 when rounded to 1dp
                     # start of message is key word for HUC12Models
                     QSWATUtils.information('WARNING: only {0} percent of the watershed in project huc{1} is inside the soil map.'
-                                           .format(locale.format_string('%.1F', soilMapPercent), huc12), self._gv.isBatch, logFile=logFile)
+                                           .format(locale.format_string('%.1F', soilMapPercent), huc12), self._gv.isBatch)
                 if soilDefinedPercent < 80:
                     # start of message is key word for HUC12Models
                     QSWATUtils.information('WARNING: only {0} percent of the watershed in project huc{1} has defined soils.'
-                                           .format(locale.format_string('%.1F', soilDefinedPercent), huc12), self._gv.isBatch, logFile=logFile)
+                                           .format(locale.format_string('%.1F', soilDefinedPercent), huc12), self._gv.isBatch)
             else:
                 if soilMapPercent < 95:
                     QSWATUtils.information('WARNING: only {0} percent of the watershed has defined soil values.\n If this percentage is zero check your soil map has the same projection as your DEM.'.format(locale.format_string('%.1F', soilMapPercent)), self._gv.isBatch)
