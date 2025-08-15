@@ -233,6 +233,8 @@ class QSWATUtils:
         Copy .prj file, if it exists, from inFile to .prj file of outFile,
         unless outFile is .dat.
         """
+        inFile = os.path.normpath(inFile)
+        outFile = os.path.normpath(outFile)
         inBase: str = os.path.splitext(inFile)[0]
         outBase, outSuffix = os.path.splitext(outFile)
         if not outSuffix == '.dat':

@@ -4039,7 +4039,9 @@ class QSWATTopology:
         demReduction = float(depth) / verticalFactor
 
         # ensure output directory exists
-        burnDir = os.path.dirname(burnFile)
+        demFile = os.path.normpath(demFile)
+        burnFile = os.path.normpath(burnFile)
+        burnDir = os.path.normpath(os.path.dirname(burnFile))
         if not burnDir:
             QSWATUtils.error(f'Burn file {burnFile} has no directory', isBatch)
             return
