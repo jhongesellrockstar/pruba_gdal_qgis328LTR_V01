@@ -1,8 +1,7 @@
 @echo off
 REM Copia un DEM para probar si GDAL puede crear archivos GeoTIFF
 REM Ajustar las rutas para su entorno antes de ejecutar
-set "DEM=C:\Users\jhonv\Desktop\Robit08\Watershed\Rasters\DEM\srtm_30m.tif"
-set "COPIA=C:\Users\jhonv\Desktop\Robit08\Watershed\Rasters\DEM\srtm_30m_copy.tif"
+
 
 python - <<PY
 import sys
