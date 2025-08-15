@@ -233,14 +233,19 @@ class TauDEMUtils:
         procCommand = commands if Parameters._ISWIN else MacPrefix + command if MacPrefixNeeded else command
         if Parameters._ISMAC:
             QSWATUtils.loginfo(procCommand)
+        env = os.environ.copy()
+        old_proj_lib = env.get('PROJ_LIB')
         if Parameters._ISWIN:
-            os.environ['PROJ_LIB'] = os.getenv('PROJ_DATA')
-            os.environ['GDAL_DRIVER_PATH'] = TauDEMDir + '/gdalplugins'
-        proc = subprocess.run(procCommand, 
-                                shell=True, 
+            proj_data = os.getenv('PROJ_DATA')
+            if proj_data and os.path.exists(proj_data):
+                env['PROJ_LIB'] = proj_data
+            env['GDAL_DRIVER_PATH'] = TauDEMDir + '/gdalplugins'
+        proc = subprocess.run(procCommand,
+                                shell=True,
                                 stdout=subprocess.PIPE,
                                 stderr=subprocess.PIPE,
-                                universal_newlines=True)    # text=True) only in python 3.7 
+                                universal_newlines=True,
+                                env=env)    # text=True) only in python 3.7
         if hasQGIS:
             assert output is not None
             output.append(proc.stdout)
