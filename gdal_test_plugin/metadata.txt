@@ -1,9 +1,0 @@
-[general]
-name=GDAL Test Plugin
-description=Plugin de prueba que muestra la lectura y copia de datos raster usando GDAL.
-version=1.0
-qgisMinimumVersion=3.28
-author=OpenAI Assistant
-email=noreply@example.com
-about=Plugin de prueba para QGIS 3.28 LTR que ejecuta operaciones simples de GDAL sin modificar los archivos originales.
-icon=icon.svg
