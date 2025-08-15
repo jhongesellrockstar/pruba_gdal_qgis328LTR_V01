@@ -31,6 +31,7 @@ import os.path
 import time
 import csv
 import traceback
+import shutil
 from typing import Set, List, Dict, Tuple, Iterable, Iterator, cast, Any, Optional, Union, Callable, TYPE_CHECKING  # @UnusedImport @Reimport
 
 # if TYPE_CHECKING:
@@ -4069,7 +4070,7 @@ class QSWATTopology:
 
         try:
             gdal.UseExceptions()
-            burnDs = driver.CreateCopy(burnFile, demDs, 0)
+            burnDs = driver.CreateCopy(burnFile, demDs, 0, options=['BIGTIFF=YES'])
         except RuntimeError as e:
             QSWATUtils.error(f'Failed to copy DEM from {demFile} to {burnFile}: {e}', isBatch)
             lastErr = gdal.GetLastErrorMsg()
@@ -4078,7 +4079,18 @@ class QSWATTopology:
             demDs = None
             QSWATUtils.information(f'Removing {burnFile} due to failed copy', isBatch)
             QSWATUtils.tryRemoveFiles(burnFile)
-            return
+            # Fallback to shutil.copyfile if GDAL copy fails
+            try:
+                shutil.copyfile(demFile, burnFile)
+                QSWATUtils.information(f'Fallback copy succeeded for {burnFile}', isBatch)
+            except Exception as copyErr:
+                QSWATUtils.error(f'Shutil copy failed: {copyErr}', isBatch)
+                return
+            burnDs = gdal.Open(burnFile, gdal.GA_Update)
+            if burnDs is None:
+                QSWATUtils.error(f'Failed to open fallback DEM {burnFile}', isBatch)
+                QSWATUtils.tryRemoveFiles(burnFile)
+                return
 
         if burnDs is None:
             QSWATUtils.error(f'Failed to create burned-in DEM {burnFile} from {demFile}', isBatch)
