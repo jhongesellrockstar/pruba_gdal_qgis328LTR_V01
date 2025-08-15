@@ -1,10 +1,7 @@
 @echo off
 REM Copia un DEM para probar si GDAL puede crear archivos GeoTIFF
 REM Ajustar las rutas para su entorno antes de ejecutar
-REM DEM original en formato Arc/Info (archivo hdr.adf)
-set "DEM=C:\Users\jhonv\Downloads\robit_data\rasters\srtm_30m\hdr.adf"
-REM Archivo de salida para la copia de prueba
-set "COPIA=C:\Users\jhonv\Downloads\robit_data\rasters\srtm_30m\hdr_copy.tif"
+
 
 python - <<PY
 import sys
