@@ -4076,12 +4076,14 @@ class QSWATTopology:
             if lastErr:
                 QSWATUtils.error(lastErr, isBatch)
             demDs = None
+            QSWATUtils.information(f'Removing {burnFile} due to failed copy', isBatch)
             QSWATUtils.tryRemoveFiles(burnFile)
             return
 
         if burnDs is None:
             QSWATUtils.error(f'Failed to create burned-in DEM {burnFile} from {demFile}', isBatch)
             demDs = None
+            QSWATUtils.information(f'Removing {burnFile} due to failed creation', isBatch)
             QSWATUtils.tryRemoveFiles(burnFile)
             return
 
