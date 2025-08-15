@@ -29,7 +29,7 @@
 from qgis.PyQt.QtCore import Qt, QObject, QFileInfo
 from qgis.PyQt.QtGui import QIntValidator, QDoubleValidator
 #from qgis.PyQt.QtWidgets import *  # @UnusedWildImport
-from qgis.core import Qgis, QgsFeature, QgsFields, QgsProject, QgsRasterLayer, QgsVectorFileWriter, QgsVectorLayer, QgsWkbTypes, QgsCoordinateTransformContext
+from qgis.core import Qgis, QgsFeature, QgsFields, QgsProject, QgsRasterLayer, QgsVectorFileWriter, QgsVectorLayer, QgsWkbTypes, QgsCoordinateTransformContext, QgsProcessingException
 from qgis.analysis import QgsRasterCalculator, QgsRasterCalculatorEntry
 import os.path
 #import subprocess
@@ -243,25 +243,24 @@ class Landscape(QObject):
                 extra = '--config GDALWARP_IGNORE_BAD_CUTLINE YES'
             else:
                 extra = '--config GDALWARP_IGNORE_BAD_CUTLINE YES -overwrite'
-            processing.run("gdal:cliprasterbymasklayer", 
-                           {'INPUT':inFile,
-                            'MASK':clipperFile,
-                            'SOURCE_CRS': self._gv.crsProject,
-                            'NODATA':self.noData,
-                            'CROP_TO_CUTLINE':True,
-                            'DATA_TYPE':0,
-                            'EXTRA':extra,
-                            'OUTPUT':clipFile})
-#             command = 'gdalwarp --config GDALWARP_IGNORE_BAD_CUTLINE YES -dstnodata {3} -overwrite -cutline "{0}" -crop_to_cutline -of GTiff "{1}" "{2}"'.format(clipperFile, inFile, clipFile, self.noData)
-#             proc = subprocess.run(command,  # @UnusedVariable
-#                                     shell=True,
-#                                     stdout=subprocess.PIPE,
-#                                     stderr=subprocess.STDOUT,
-#                                     universal_newlines=True)    # text=True) only in python 3.7
-            #for line in  proc.stdout.split('\n'):
-            #    QSWATUtils.loginfo(line)
+            try:
+                processing.run("gdal:cliprasterbymasklayer",
+                               {'INPUT':inFile,
+                                'MASK':clipperFile,
+                                'SOURCE_CRS': self._gv.crsProject,
+                                'NODATA':self.noData,
+                                'CROP_TO_CUTLINE':True,
+                                'DATA_TYPE':0,
+                                'EXTRA':extra,
+                                'OUTPUT':clipFile})
+            except QgsProcessingException as ex:
+                QSWATUtils.error('GDAL clip failed: {0}'.format(ex), self._gv.isBatch)
+                return '', False
             QSWATUtils.copyPrj(inFile, clipFile)
-            assert os.path.exists(clipFile), 'Failed to create clipped raster  {2} by clipping {0} with {1}'.format(inFile, clipperFile, clipFile)
+            if not os.path.exists(clipFile):
+                msg = 'Failed to create clipped raster {2} by clipping {0} with {1}'.format(inFile, clipperFile, clipFile)
+                QSWATUtils.error(msg, self._gv.isBatch)
+                raise RuntimeError(msg)
             # gdalwarp can leave file untouched if it already existed, so we (effectively) touch it
             os.utime(clipFile, None)
             isNewFile = True
