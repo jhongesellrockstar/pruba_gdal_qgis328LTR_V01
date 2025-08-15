@@ -4072,12 +4072,17 @@ class QSWATTopology:
             burnDs = driver.CreateCopy(burnFile, demDs, 0)
         except RuntimeError as e:
             QSWATUtils.error(f'Failed to copy DEM from {demFile} to {burnFile}: {e}', isBatch)
+            lastErr = gdal.GetLastErrorMsg()
+            if lastErr:
+                QSWATUtils.error(lastErr, isBatch)
             demDs = None
+            QSWATUtils.tryRemoveFiles(burnFile)
             return
 
         if burnDs is None:
             QSWATUtils.error(f'Failed to create burned-in DEM {burnFile} from {demFile}', isBatch)
             demDs = None
+            QSWATUtils.tryRemoveFiles(burnFile)
             return
 
         demDs = None

@@ -1776,8 +1776,19 @@ assumed that its crossing the lake boundary is an inaccuracy.
                 QSWATUtils.tryRemoveLayerAndFiles(burnedDemFile, root)
                 self.progress('Burning streams ...')
                 QSWATTopology.burnStream(burnFile, demFile, burnedDemFile, self._gv.burninDepth, self._gv.verticalFactor, self._gv.isBatch)
-                if not os.path.exists(burnedDemFile):
+                if not os.path.exists(burnedDemFile) or os.path.getsize(burnedDemFile) == 0:
+                    QSWATUtils.error('Failed to create burned in DEM {0}'.format(burnedDemFile), self._gv.isBatch)
+                    QSWATUtils.tryRemoveFiles(burnedDemFile)
                     return
+                try:
+                    testDs = gdal.Open(burnedDemFile)
+                except Exception:
+                    testDs = None
+                if testDs is None:
+                    QSWATUtils.error('Burned in DEM {0} is invalid'.format(burnedDemFile), self._gv.isBatch)
+                    QSWATUtils.tryRemoveFiles(burnedDemFile)
+                    return
+                testDs = None
             self._gv.burnedDemFile = burnedDemFile
             delineationDem = burnedDemFile
         else:
