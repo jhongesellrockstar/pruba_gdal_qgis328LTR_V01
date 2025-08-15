@@ -21,7 +21,8 @@
 """
 # Import the PyQt and QGIS libraries
 from qgis.PyQt.QtCore import QSettings # @UnresolvedImport
-#from qgis.PyQt.QtGui import *  # @UnusedWildImport type: ignore 
+from qgis.PyQt.QtWidgets import QMessageBox  # @UnresolvedImport
+#from qgis.PyQt.QtGui import *  # @UnusedWildImport type: ignore
 from qgis.core import QgsCoordinateReferenceSystem, QgsUnitTypes, QgsCoordinateTransform, QgsProject, QgsFeatureRequest, QgsField, QgsFeature, QgsVectorLayer, QgsPointXY, QgsRasterLayer, QgsExpression, QgsGeometry, QgsVectorDataProvider, QgsRectangle, QgsLayerTreeGroup,  QgsLayerTreeLayer  # @UnresolvedImport
 from osgeo import gdal  # type: ignore
 import math
@@ -4047,7 +4048,13 @@ class QSWATTopology:
             return
         os.makedirs(burnDir, exist_ok=True)
 
-        assert not os.path.exists(burnFile)
+        if os.path.exists(burnFile):
+            if not isBatch and QSWATUtils.question(
+                    f'Burn file {burnFile} already exists. Overwrite?', isBatch, False) == QMessageBox.Yes:
+                QSWATUtils.tryRemoveFiles(burnFile)
+            else:
+                QSWATUtils.error(f'Burn file {burnFile} already exists', isBatch)
+                return
 
         demDs = gdal.Open(demFile, gdal.GA_ReadOnly)
         if demDs is None:
