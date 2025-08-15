@@ -105,7 +105,7 @@ class QSWATUtils:
         This only seems to work on Windows"""
         try:
             import qgis
-            dirs = qgis.__file__.split('/')  # @UndefinedVariable
+            dirs = os.path.normpath(qgis.__file__).split(os.sep)  # @UndefinedVariable
             for i in range(len(dirs)):
                 if dirs[i] == 'apps':
                     return dirs[i+1]
