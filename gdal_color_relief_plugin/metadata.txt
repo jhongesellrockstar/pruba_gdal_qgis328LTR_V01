@@ -1,0 +1,9 @@
+[general]
+name=DEM Color Relief
+description=Aplica una rampa de color a un DEM usando GDAL.
+version=1.0
+qgisMinimumVersion=3.28
+author=OpenAI Assistant
+email=noreply@example.com
+about=Genera un raster a color a partir de un DEM para facilitar la visualización.
+icon=icon.svg

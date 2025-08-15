@@ -1,4 +1,9 @@
 Desarrollo de software plugin para QGIS 3.28 LTR STANDALONE haciendo uso de GDAL.
+
+El repositorio incluye ahora dos plugins de ejemplo:
+
+* `gdal_test_plugin`: copia rasters seleccionados utilizando GDAL.
+* `gdal_color_relief_plugin`: aplica una rampa de color a un DEM mediante GDAL.
 <img width="1366" height="705" alt="image" src="https://github.com/user-attachments/assets/34693439-5029-4584-a065-bb66300def42" />
 
 
