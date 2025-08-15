@@ -3851,9 +3851,22 @@ class QSWATTopology:
         if driver is None:
             QSWATUtils.error('Could not get GTiff driver.', self.isBatch)
             return -1
-        hd8Ds = driver.CreateCopy(gv.hd8File, ad8Ds, 0)
+        try:
+            hd8Ds = driver.CreateCopy(gv.hd8File, ad8Ds, 0, options=['BIGTIFF=YES'])
+        except RuntimeError as e:
+            QSWATUtils.loginfo('Warning: failed to create hd8 file {0}: {1}'.format(gv.hd8File, e))
+            if os.path.exists(gv.hd8File):
+                try:
+                    os.remove(gv.hd8File)
+                except Exception:
+                    pass
+            try:
+                shutil.copyfile(gv.ad8File, gv.hd8File)
+                hd8Ds = gdal.Open(gv.hd8File, gdal.GA_Update)
+            except Exception:
+                hd8Ds = None
         if not hd8Ds:
-            QSWATUtils.error('Failed to create hd8 file {0}'.format(gv.hd8File), self.isBatch)
+            QSWATUtils.error('Failed to reopen hd8 file {0} after copy'.format(gv.hd8File), self.isBatch)
             return -1
         ad8Ds = None
         QSWATUtils.copyPrj(gv.ad8File, gv.hd8File)
