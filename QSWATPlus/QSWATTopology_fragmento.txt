@@ -1,0 +1,104 @@
+    def burnStream(streamFile: str, demFile: str, burnFile: str, depth: float, verticalFactor: float, isBatch: bool) -> None:
+        """Create as burnFile a copy of demFile with points on lines streamFile reduced in height by depth metres."""
+        # use vertical factor to convert from metres to vertical units of DEM
+        demReduction = float(depth) / verticalFactor
+
+        # Crear carpeta si no existeS
+        burnDir = os.path.dirname(burnFile) #Esta linea y la conficional IF siguiente se han creado
+        if not os.path.exists(burnDir):
+            os.makedirs(burnDir)
+
+
+        assert not os.path.exists(burnFile)
+        demDs = gdal.Open(demFile, gdal.GA_ReadOnly)
+        demDs = gdal.Open(demFile, gdal.GA_ReadOnly)
+        if demDs is None: # 'if' agregado
+            QSWATUtils.error(f'Could not open DEM file {demFile}', isBatch)
+            return
+        driver = gdal.GetDriverByName('GTiff')
+        if driver is None:
+            QSWATUtils.error('Could not get GTiff driver.', isBatch)
+            return
+
+        burnDs = driver.CreateCopy(burnFile, demDs, 0) #El error comienza aca
+        if burnDs is None:
+            QSWATUtils.error('Failed to create burned-in DEM {0}'.format(burnFile), isBatch)
+            return
+        demDs = None
+        QSWATUtils.copyPrj(demFile, burnFile)
+        band = burnDs.GetRasterBand(1)
+        nodata = band.GetNoDataValue()
+        burnTransform = burnDs.GetGeoTransform()
+        streamLayer = QgsVectorLayer(streamFile, 'Burn in streams', 'ogr')
+        start = time.process_time()
+        countHits = 0
+        countPoints = 0
+        countChanges = 0
+        changed: Dict[int, List[int]] = dict()
+        for reach in streamLayer.getFeatures():
+            geometry = reach.geometry()
+            if geometry.isMultipart():
+                lines = geometry.asMultiPolyline()
+            else:
+                lines = [geometry.asPolyline()]
+            for line in lines:
+                for i in range(len(line) - 1):
+                    countPoints += 1
+                    p0 = line[i]
+                    px0 = p0.x()
+                    py0 = p0.y()
+                    x0, y0 = QSWATTopology.projToCell(px0, py0, burnTransform)
+                    p1 = line[i+1]
+                    px1 = p1.x()
+                    py1 = p1.y()
+                    x1, y1 = QSWATTopology.projToCell(px1, py1, burnTransform)
+                    steep = abs(y1 - y0) > abs(x1 - x0)
+                    if steep:
+                        x0, y0 = y0, x0
+                        x1, y1 = y1, x1
+                    if x0 > x1:
+                        x0, x1 = x1, x0
+                        y0, y1 = y1, y0
+                    deltax = x1 - x0
+                    deltay = abs(y1 - y0)
+                    err = 0
+                    deltaerr = deltay
+                    y = y0
+                    ystep = 1 if y0 < y1 else -1
+                    arr: ndarray[float] = array([[0.0]])
+                    for x in range(x0, x1+1):
+                        if steep:
+                            if QSWATTopology.addPointToChanged(changed, y, x):
+                                # read can raise exception if coordinates outside extent
+                                try:
+                                    arr = band.ReadAsArray(y, x, 1, 1)
+                                    # arr may be none if stream map extends outside DEM extent
+                                    if arr and arr[0,0] != nodata:
+                                        arr[0,0] = arr[0,0] - demReduction
+                                        band.WriteArray(arr, y, x)
+                                        countChanges += 1
+                                except:
+                                    pass
+                            else:
+                                countHits += 1
+                        else:
+                            if QSWATTopology.addPointToChanged(changed, x, y):
+                                # read can raise exception if coordinates outside extent
+                                try:
+                                    arr = band.ReadAsArray(x, y, 1, 1)
+                                    # arr may be none if stream map extends outside DEM extent
+                                    if arr and arr[0,0] != nodata:
+                                        arr[0,0] = arr[0,0] - demReduction
+                                        band.WriteArray(arr, x, y)
+                                        countChanges += 1
+                                except:
+                                    pass   
+                            else:
+                                countHits += 1
+                        err += deltaerr
+                        if 2 * err < deltax:
+                            continue
+                        y += ystep
+                        err -= deltax
+        finish = time.process_time()
+        QSWATUtils.loginfo('Created burned-in DEM {0} in {1!s} milliseconds; {2!s} points; {3!s} hits; {4!s} changes'.format(burnFile, int((finish - start)*1000), countPoints, countHits, countChanges))

@@ -1,0 +1,13 @@
+[general]
+name=QSWATPlus
+description=Create SWAT+ inputs
+qgisMinimumVersion=3.16
+qgisMaximumVersion=3.34
+version=3.0.6
+author=Chris George
+email=cgeorge@tamu.edu
+tags=SWAT, SWAT+, watershed model
+homepage=http://swat.tamu.edu/software/plus/
+icon=SWATPlus32.png
+experimental=False
+deprecated=False
