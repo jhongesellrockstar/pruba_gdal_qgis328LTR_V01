@@ -3841,15 +3841,14 @@ class QSWATTopology:
         threshold = int(2 * maxContrib)
         del ad8Layer
         # copy ad8 to hd8 and then set outlet point values to threshold
-        ad8Ds = gdal.Open(gv.ad8File, gdal.GA_ReadOnly) # el siguiente if lo agrega JGVP
+        ad8Ds = gdal.Open(gv.ad8File, gdal.GA_ReadOnly)
         if ad8Ds is None:
             QSWATUtils.error('Cannot open ad8 file {0}'.format(gv.ad8File), self.isBatch)
             return -1
-        driver = gdal.GetDriverByName('GTiff') # Este if y su else tambien son añadidos por JGVP
-        if ad8Ds is None:
-            raise RuntimeError("Dataset ad8Ds es None: no se pudo cargar el dataset fuente antes de CreateCopy.")
-        else:
-            print(f"✅ Dataset ad8Ds cargado correctamente: {ad8Ds.GetDescription()}")
+        driver = gdal.GetDriverByName('GTiff')
+        if driver is None:
+            QSWATUtils.error('Could not get GTiff driver.', self.isBatch)
+            return -1
         hd8Ds = driver.CreateCopy(gv.hd8File, ad8Ds, 0)
         if not hd8Ds:
             QSWATUtils.error('Failed to create hd8 file {0}'.format(gv.hd8File), self.isBatch)
