@@ -834,7 +834,7 @@ either smaller to lengthen the stream or larger to remove it.  Or if the lake is
                     percent = int(secondArea * 100.0 / maxArea + 0.5)
                     QSWATUtils.loginfo('Second part area is {0}% of first'.format(percent))
                     if percent >= 5:
-                        QSWATUtils.information('Warning: part with {0} percent of main part of lake {1} is being ignored.'.format(percent, lakeId), self._gv.isBatch, reportErrors=reportErrors)
+                        QSWATUtils.information('Warning: part with {0} percent of main part of lake {1} is being ignored.'.format(percent, lakeId), self._gv.isBatch)
                 geoMap[lake.id()] = maxPart
             else:
                 # keep islands
@@ -907,27 +907,27 @@ either smaller to lengthen the stream or larger to remove it.  Or if the lake is
                                 QSWATUtils.information(
 """Channel with LINKNO {0}  crosses the  boundary of lake {1}
 more than once.  Since it starts and terminates in the lake it
-will be assumed that its crossing the lake boundary is an 
+will be assumed that its crossing the lake boundary is an
 inaccuaracy of delineation and that it is internal to the lake.
-""".format(chLink, lakeId), self._gv.isBatch, reportErrors=reportErrors)
+""".format(chLink, lakeId), self._gv.isBatch)
                             else:
                                 QSWATUtils.information(
 """Channel with LINKNO {0} crosses the  boundary of lake {1}
-more than once.  Since it starts outside and terminates inside 
-the lake it will be assumed that its extra crossings of the lake 
-boundary are an inaccuaracy of delineation and that it enters 
+more than once.  Since it starts outside and terminates inside
+the lake it will be assumed that its extra crossings of the lake
+boundary are an inaccuaracy of delineation and that it enters
 the lake at its first crossing point.
-""".format(chLink, lakeId), self._gv.isBatch, reportErrors=reportErrors)
+""".format(chLink, lakeId), self._gv.isBatch)
                             currentPointId = makeNewPoint(points, source, outlet, line, newPoints, currentPointId, 0, chLink, lakeId, fields, transform)
                         else:
                             if QSWATTopology.polyContains(source, geom, box):
                                 QSWATUtils.information(
 """Channel with LINKNO {0} crosses the  boundary of lake {1}
-more than once.  Since it starts in the lake and terminates 
-outside it will be assumed that its multiple crossings 
-of the lake boundary are an inaccuaracy of delineation and 
+more than once.  Since it starts in the lake and terminates
+outside it will be assumed that its multiple crossings
+of the lake boundary are an inaccuaracy of delineation and
 that it flows out the lake at its last crossing point.
-""".format(chLink, lakeId), self._gv.isBatch, reportErrors=reportErrors)
+""".format(chLink, lakeId), self._gv.isBatch)
                                 currentPointId = makeNewPoint(points, source, outlet, line, newPoints, currentPointId, res, chLink, lakeId, fields, transform)
                             else:
                                 crossingChannels.append((channel, points))
@@ -974,10 +974,10 @@ that it flows out the lake at its last crossing point.
             for channel, points in crossingChannels:
                 chLink0 = channel[channelLinkIndex]
                 QSWATUtils.information(
-"""Channel with LINKNO {0} enters and then leaves lake {1}.  
-Since it starts and terminates outside the lake it will be 
-assumed that its crossing the lake boundary is an inaccuracy. 
-""".format(chLink0, lakeId), self._gv.isBatch, reportErrors=reportErrors)
+"""Channel with LINKNO {0} enters and then leaves lake {1}.
+Since it starts and terminates outside the lake it will be
+assumed that its crossing the lake boundary is an inaccuracy.
+""".format(chLink0, lakeId), self._gv.isBatch)
             if numOutlets == 0:
                 # last chance to include lake - check if it has a watershed outlet inside it
                 for subbasin, (pointId, pt, _) in self._gv.topo.outlets.items():

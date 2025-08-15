@@ -1159,7 +1159,7 @@ See QSWAT+ log messages for full list of undefined soils.""".
         if lookup_row is None:
             QSWATUtils.loginfo('SSURGO soil map value {0} not defined as lkey'.format(sid))
             if not self.SSURGOUndefinedMapValueReported:
-                QSWATUtils.information('WARNING: SSURGO soil map value {0} (and perhaps others) not defined as lkey in statsgo_ssurgo_lkey in project {1}.  See QSWAT+ log messages.'.format(sid, self.projName), self.isBatch, logFile=self.logFile)
+                QSWATUtils.information('WARNING: SSURGO soil map value {0} (and perhaps others) not defined as lkey in statsgo_ssurgo_lkey in project {1}.  See QSWAT+ log messages.'.format(sid, self.projName), self.isBatch)
                 self.SSURGOUndefinedMapValueReported = True
             self._undefinedSoilIds.append(sid)
             return sid, False
@@ -1174,7 +1174,7 @@ See QSWAT+ log messages for full list of undefined soils.""".
             QSWATUtils.loginfo('SSURGO soil lkey value {0} and MUID {1} not defined'.format(sid, lookup_row[1]))
             if not self.SSURGOUndefinedKeyReported:
                 if not self.isHAWQS:  # minimise interruptions to HAWQS runs
-                    QSWATUtils.information('WARNING: SSURGO soil lkey value {0} (and perhaps others) and MUID {1} not defined in project {2}.  See QSWAT+ log messages.'.format(sid, lookup_row[1], self.projName), self.isBatch, logFile=self.logFile)
+                    QSWATUtils.information('WARNING: SSURGO soil lkey value {0} (and perhaps others) and MUID {1} not defined in project {2}.  See QSWAT+ log messages.'.format(sid, lookup_row[1], self.projName), self.isBatch)
                 self.SSURGOUndefinedKeyReported = True
             self._undefinedSoilIds.append(sid)
             return self.SSURGOUndefined, False

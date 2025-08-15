@@ -837,7 +837,7 @@ class QSWATTopology:
         lakeAreaIndex = lakesProvider.fieldNameIndex(AREA)
         if lakeResIndex < 0:
             QSWATUtils.information('No RES field in lakes shapefile {0}: assuming lakes are reservoirs'.
-                                   format(QSWATUtils.layerFilename(lakesLayer)), self.isBatch, reportErrors=reportErrors)
+                                   format(QSWATUtils.layerFilename(lakesLayer)), self.isBatch)
         subsProvider =  subbasinsLayer.dataProvider()
         subsPolyIndex = subsProvider.fieldNameIndex(QSWATTopology._POLYGONID)
         subsAreaIndex = subsProvider.fieldNameIndex(Parameters._AREA)
@@ -1065,7 +1065,7 @@ class QSWATTopology:
                     if found:
                         if lakeData.outPoint[2] is not None:
                             QSWATUtils.information('User marked outlet {0} chosen as main outlet for lake {1}'.
-                                                   format(pointId, lakeId), gv.isBatch, reportErrors=reportErrors)
+                                                   format(pointId, lakeId), gv.isBatch)
                             if lakeData.outChLink >= 0:
                                 lakeData.otherOutChLinks.add(lakeData.outChLink)
                         elev = QSWATTopology.valueAtPoint(lakeOutlet, demLayer)
@@ -1180,7 +1180,7 @@ class QSWATTopology:
             if percentChBasinWater < 99 or percentChBasinWater > 101:
                 QSWATUtils.information(u"""WARNING: Only {0}% of the area of lake {1} is accounted for in your watershed.
                 You should carefully check the messages concerning this lake in the QSWAT+ log in the QGIS log messages panel."""
-                                       .format(intPercent, lakeId), self.isBatch, reportErrors=reportErrors)
+                                       .format(intPercent, lakeId), self.isBatch)
         if len(self.lakesData) == 0:
             QSWATUtils.error('No lakes found in {0}'.format(QSWATUtils.layerFilename(lakesLayer)), self.isBatch)
             return False
@@ -1376,7 +1376,7 @@ class QSWATTopology:
         if not multipleOutletsInteractive:
             QSWATUtils.information(
                 'For information on {0} lakes with multiple possible outlets see the QSWAT+ log'.
-                format(multipleOutletCount), gv.isBatch, reportErrors=reportErrors)
+                format(multipleOutletCount), gv.isBatch)
         # find outlet with largest drainage and mark as THE outlet
         for lakeId, data in exitData.items():
             # set maxDrainage less than -1 value used for missing drainage so that first exit link registers
@@ -1430,7 +1430,7 @@ class QSWATTopology:
                 msg = """Warning: Stream link {0} chosen as main outlet for all of lake {1}.  
                         Other possible outlet stream links are {2}.""".format(exLink, lakeId, str([int(link) for link in others]))
                 if multipleOutletsInteractive:
-                    QSWATUtils.information(msg, gv.isBatch, reportErrors=reportErrors)
+                    QSWATUtils.information(msg, gv.isBatch)
                 else:
                     QSWATUtils.loginfo(msg)
             self.chLinkFromLake[exLink] = lakeId
@@ -1551,8 +1551,8 @@ class QSWATTopology:
                     return False
                 if data.waterRole == QSWATTopology._PLAYATYPE:
                     QSWATUtils.information('Channel with LINKNO {0} flows into {1} lake {2}.  This is ignored.'.
-                                           format(chLink, QSWATTopology.lakeCategory(data.waterRole), lakeIn), 
-                                           gv.isBatch, reportErrors=reportErrors)
+                                           format(chLink, QSWATTopology.lakeCategory(data.waterRole), lakeIn),
+                                           gv.isBatch)
                 else:
                     reachData = self.getReachData(channel, demLayer)
                     assert reachData is not None
@@ -1577,8 +1577,8 @@ class QSWATTopology:
                     return False
                 if data.waterRole == QSWATTopology._PLAYATYPE:
                     QSWATUtils.information('Channel with LINKNO {0} inside {1} lake {2}.  This is ignored.'.
-                                           format(chLink, QSWATTopology.lakeCategory(data.waterRole), lakeIn), 
-                                           gv.isBatch, reportErrors=reportErrors)
+                                           format(chLink, QSWATTopology.lakeCategory(data.waterRole), lakeIn),
+                                           gv.isBatch)
                 else:
                     data.lakeChLinks.add(chLink)
                     self.chLinkInsideLake[chLink] = lakeWithin
@@ -1603,8 +1603,8 @@ class QSWATTopology:
                     return False
                 if data.waterRole == QSWATTopology._PLAYATYPE:
                     QSWATUtils.information('Channel with LINKNO {0} flows out of {1} lake {2}.  This is ignored.'.
-                                           format(chLink, QSWATTopology.lakeCategory(data.waterRole), lakeIn), 
-                                           gv.isBatch, reportErrors=reportErrors)
+                                           format(chLink, QSWATTopology.lakeCategory(data.waterRole), lakeIn),
+                                           gv.isBatch)
                 else:
                     if lakeMain == lakeOut:
                         # lake's main outlet
