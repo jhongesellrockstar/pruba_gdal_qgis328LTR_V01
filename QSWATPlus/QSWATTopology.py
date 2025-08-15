@@ -4038,10 +4038,12 @@ class QSWATTopology:
         # use vertical factor to convert from metres to vertical units of DEM
         demReduction = float(depth) / verticalFactor
 
-        # Crear carpeta si no existe
+        # ensure output directory exists
         burnDir = os.path.dirname(burnFile)
-        if not os.path.exists(burnDir):
-            os.makedirs(burnDir)
+        if not burnDir:
+            QSWATUtils.error(f'Burn file {burnFile} has no directory', isBatch)
+            return
+        os.makedirs(burnDir, exist_ok=True)
 
         assert not os.path.exists(burnFile)
 
@@ -4055,19 +4057,17 @@ class QSWATTopology:
             QSWATUtils.error('Could not get GTiff driver.', isBatch)
             return
 
-        print(f"✅ burnFile path: {burnFile}")
-        print(f"✅ demFile path: {demFile}")
-        print(f"✅ burnFile exists: {os.path.exists(burnFile)}")
-        print(f"✅ demFile exists: {os.path.exists(demFile)}")
-        "burnDs = driver.CreateCopy(burnFile, demDs, 0)"
         try:
+            gdal.UseExceptions()
             burnDs = driver.CreateCopy(burnFile, demDs, 0)
-        except Exception as e:
-            QSWATUtils.error(f'GDAL CreateCopy failed: {e}', isBatch)
+        except RuntimeError as e:
+            QSWATUtils.error(f'Failed to copy DEM from {demFile} to {burnFile}: {e}', isBatch)
+            demDs = None
             return
 
         if burnDs is None:
-            QSWATUtils.error(f'Failed to create burned-in DEM {burnFile}', isBatch)
+            QSWATUtils.error(f'Failed to create burned-in DEM {burnFile} from {demFile}', isBatch)
+            demDs = None
             return
 
         demDs = None
@@ -4145,6 +4145,7 @@ class QSWATTopology:
         finish = time.process_time()
         QSWATUtils.loginfo(
             f'Created burned-in DEM {burnFile} in {int((finish - start) * 1000)} milliseconds; {countPoints} points; {countHits} hits; {countChanges} changes')
+        burnDs = None
 
     @staticmethod
     def addPointToChanged(changed: Dict[int, List[int]], col: int, row: int) -> bool:
