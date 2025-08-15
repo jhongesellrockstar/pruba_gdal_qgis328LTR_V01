@@ -4040,6 +4040,7 @@ class QSWATTopology:
         demReduction = float(depth) / verticalFactor
 
         # ensure output directory exists
+        streamFile = os.path.normpath(streamFile)
         demFile = os.path.normpath(demFile)
         burnFile = os.path.normpath(burnFile)
         burnDir = os.path.normpath(os.path.dirname(burnFile))
